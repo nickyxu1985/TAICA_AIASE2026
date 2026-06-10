@@ -323,7 +323,7 @@
 
 <header class="page-header">
     <h1>🏛️ 期末專案：在 Hermes Agent 上打造可驗證的 Skill</h1>
-    <p class="subtitle"></p>
+    <p class="subtitle">課程期末大型作業｜Verifiable Skills &amp; Multi-Agent Engineering on Hermes Agent</p>
     <p class="byline">課程：AIASE 2026 · 莊坤達 · NCKU CSIE　·　文件日期 2026-05-29</p>
   </header>
 
@@ -335,8 +335,8 @@
 
 <main>
 <blockquote>
-<p><strong>課程期末大型作業｜Verifiable Skills &amp; Multi-Agent Engineering on Hermes Agent</strong><br>
-本專案為延續 HW1–HW4 的一個較大型作業，請以「規模較大的作業」視之，依規格逐步完成。<br>
+<p><strong>課程期末大型作業｜Verifiable Skills &amp; Multi-Agent Engineering on Hermes Agent</strong>
+本專案為延續 HW1–HW4 的一個較大型作業，請以「規模較大的作業」視之，依規格逐步完成。
 繳交方式：上傳至 GitHub Classroom</p>
 </blockquote>
 <aside class="callout callout-warn"><strong>公告</strong><p><strong>請特別注意：本次期末成果將對外公布。</strong> 完成後，課程會將整體成果透過 <strong>TAICA（臺灣人工智慧卓越中心聯盟課程平台）對外宣布</strong>。這代表你的努力不只是一份課堂作業，而會成為一個公開、可被看見的工程成果 —— 也因此，<strong>程式碼的誠信、引用規範與可重現性格外重要</strong>（詳見 §六）。</p></aside>
@@ -405,7 +405,7 @@
 <p>兩人組不應以單人規模之工作量繳交。最低要求如下：</p>
 <ol>
 <li><strong>Basic Track</strong>：仍須完成同一份 Basic skill。</li>
-<li><strong>Pairwise Track</strong>：建議兩個角色皆實作，或實作一個顯著強化版本；若只實作一個角色，須在 report 中說明另一位成員的實質貢獻。</li>
+<li><strong>Pairwise Track</strong>：兩個角色皆須實作（與單人組相同），並在 report 中說明兩位成員的實質貢獻。</li>
 <li><strong>Open Track</strong>：須包含至少兩個可獨立驗證的 scenario，或一個明顯高於單人規模的 multi-skill / multi-agent 設計。</li>
 </ol>
 <p>若最終成果經 rubric 判定未達兩人組最低要求，總分將乘上 <strong>0.90 至 0.99</strong> 的 pair-size adjustment factor。factor 由課程依 proposal、repo commit、report 分工與實際成果綜合判定。</p>
@@ -489,6 +489,8 @@
     │   └── validate_sql.py    # 例：SQL 語法驗證器
     └── references/            # 選用：補充說明
 </code></pre>
+<aside class="callout callout-tip"><strong>提示</strong><p><strong>安裝後的實際路徑可能依 category 多包一層。</strong> Hermes 會把 skill 放在 <code>~/.hermes/skills/</code> 下、並依 <code>SKILL.md</code> 的 <code>category</code> 分到子目錄（例如 <code>category: data</code> → <code>~/.hermes/skills/data/text2sql-&lt;github_id&gt;/</code>）。這不影響你 —— skill 的觸發靠<strong>名字</strong>（<code>/text2sql-&lt;github_id&gt;</code>），不是路徑。你只要確認 <code>hermes skills list</code> 看得到、<code>/skill-name</code> 叫得動即可。<code>scripts/</code> 一律用相對 skill 目錄的路徑，勿 hardcode 絕對路徑。</p></aside>
+
 <h4><code>SKILL.md</code> 格式</h4>
 <p><code>SKILL.md</code> 應包含 frontmatter + 內文，皆為 Hermes 原生欄位。例如：</p>
 <pre><code class="language-markdown">---
@@ -520,7 +522,7 @@ metadata:
 最終輸出必須是合法、可在該 schema 上執行的 SQL，且符合輸出契約之 JSON 結構。
 </code></pre>
 <h3 id="1-4-共通輸出契約-所有-track-必須遵守">1.4 共通輸出契約（所有 Track 必須遵守）</h3>
-<p>Skill 的<strong>最後一個動作</strong>必須輸出<strong>單一一段 fenced JSON 區塊</strong>，作為該任務的可驗證結果。評分器只會讀取 <code>hermes chat --toolsets skills -q</code> 的 stdout，並擷取其中<strong>最後一段</strong>以 <code>```json</code> 開頭、<code>```</code> 結尾的 fenced code block。</p>
+<p>Skill 的<strong>最後一個動作</strong>必須輸出<strong>單一一段 fenced JSON 區塊</strong>，作為該任務的可驗證結果。評分器只會讀取 <code>hermes chat</code> 的 stdout，並擷取其中<strong>最後一段</strong>以 <code>```json</code> 開頭、<code>```</code> 結尾的 fenced code block。</p>
 <p>共通規則如下：</p>
 <ol>
 <li>fenced code block 內容必須是合法 JSON，且 top-level 必須是 object，不可為 array、string 或多個 JSON object。</li>
@@ -601,11 +603,7 @@ except py_compile.PyCompileError as e:
 <h3 id="1-6-依賴-路徑與網路政策">1.6 依賴、路徑與網路政策</h3>
 <h4>Python 依賴安裝規則</h4>
 <ul>
-<li>若 skill 目錄下存在 <code>scripts/requirements.txt</code>，評分器會在安裝該 skill 後執行：</li>
-</ul>
-<p><code>bash
-  python -m pip install -r scripts/requirements.txt</code></p>
-<ul>
+<li>若 skill 目錄下存在 <code>scripts/requirements.txt</code>，評分器會在安裝該 skill 後執行 <code>python -m pip install -r scripts/requirements.txt</code>。</li>
 <li><code>requirements.txt</code> 應 pin 版本，例如 <code>radon==6.0.1</code>。</li>
 <li>不允許需要系統層級 <code>apt</code> / <code>brew</code> 安裝、GPU、Docker daemon、背景服務或互動式安裝的依賴。</li>
 <li>若 dependency installation 失敗，該 skill 視為安裝失敗。</li>
@@ -625,7 +623,7 @@ except py_compile.PyCompileError as e:
 <li>任何依賴個人 API key、個人 server、雲端資料庫、Google Drive、Notion、GitHub private resource 等外部狀態的設計，評分時不保證可用；若因此失敗，該部分不得分。</li>
 </ul>
 <h3 id="1-7-llm-模型政策-重要">1.7 LLM 模型政策（重要）</h3>
-<p>本專案所使用之 LLM，<strong>由課程統一決定，一律透過 LiteLLM Gateway 提供，學生不得自行指定外部模型供應商</strong>。<strong>所有 LLM API 存取（含 token / 額度）將由課程後續統一提供</strong>，學生不需自備任何 API key。設定方式：以 <code>hermes model</code> / <code>hermes config</code> 把 Hermes 的 provider 指向課程的 LiteLLM Gateway（OpenAI-compatible endpoint）—— 精確設定值會放在 starter repo（見 §5.1）。</p>
+<p>本專案所使用之 LLM，<strong>由課程統一決定，一律透過 LiteLLM Gateway 提供，學生不得自行指定外部模型供應商</strong>。<strong>所有 LLM API 存取（含 token / 額度）將由課程後續統一提供</strong>，學生不需自備任何 API key。設定方式：以 <code>hermes model</code> / <code>hermes config</code> 把 Hermes 的 provider 指向課程的 LiteLLM Gateway（OpenAI-compatible endpoint）—— 精確設定值會放在 starter repo（見 §5.2）。</p>
 <h4>正式計分模型池</h4>
 <p>正式分數只會來自以下模型池：</p>
 <ul>
@@ -649,7 +647,7 @@ except py_compile.PyCompileError as e:
 <thead>
 <tr>
 <th>Track</th>
-<th style="text-align: right;">%</th>
+<th>%</th>
 <th>必做</th>
 <th>評分性質</th>
 </tr>
@@ -657,25 +655,25 @@ except py_compile.PyCompileError as e:
 <tbody>
 <tr>
 <td><strong>Basic</strong>（單一 verifiable skill，固定題）</td>
-<td style="text-align: right;">30</td>
+<td>30</td>
 <td>✅ 必做</td>
 <td>100% 自動評分</td>
 </tr>
 <tr>
 <td><strong>Pairwise</strong>（雙 skill 協作，固定題）</td>
-<td style="text-align: right;">20</td>
-<td>✅ 必做；二擇一角色</td>
+<td>20</td>
+<td>✅ 必做；兩角色皆須實作</td>
 <td>100% 自動評分</td>
 </tr>
 <tr>
 <td><strong>Open Track</strong>（自選題目，自定 verifiable scenario）</td>
-<td style="text-align: right;">40</td>
+<td>40</td>
 <td>✅ 必做</td>
 <td>合規 gate（pass/fail）+ scenario 70% + 互動 log 30%</td>
 </tr>
 <tr>
 <td><strong>報告 + Demo Day</strong></td>
-<td style="text-align: right;">10</td>
+<td>10</td>
 <td>✅ 必繳</td>
 <td>設計決策與失敗分析</td>
 </tr>
@@ -756,8 +754,8 @@ except py_compile.PyCompileError as e:
 
 <h4>完整範例：一個 scenario 從頭到尾</h4>
 <p>以下示範 <code>task_nl2sql_017</code> 在 Hermes Agent 上的完整流程。</p>
-<p><strong>① 評分環境驅動 Hermes</strong>（非互動式）：</p>
-<pre><code class="language-bash">hermes chat --toolsets skills -q '/text2sql-&lt;github_id&gt; {&quot;task_id&quot;:&quot;task_nl2sql_017&quot;,&quot;question&quot;:&quot;List the names ...&quot;,&quot;db_schema&quot;:&quot;CREATE TABLE Students ...&quot;,&quot;dialect&quot;:&quot;sqlite&quot;}'
+<p><strong>① 評分環境驅動 Hermes</strong>（非互動式，正式評分指令見 §5.4）：</p>
+<pre><code class="language-bash">hermes chat --toolsets skills,terminal --yolo -q '/text2sql-&lt;github_id&gt; {&quot;task_id&quot;:&quot;task_nl2sql_017&quot;,&quot;question&quot;:&quot;List the names ...&quot;,&quot;db_schema&quot;:&quot;CREATE TABLE Students ...&quot;,&quot;dialect&quot;:&quot;sqlite&quot;}'
 </code></pre>
 <p><strong>② Hermes 載入你的 skill</strong>，依 <code>SKILL.md</code> 的 Procedure 產生 SQL，並呼叫 <code>scripts/validate_sql.py</code> 做本地語法檢查：</p>
 <pre><code class="language-python"># scripts/validate_sql.py — 你寫的確定性 harness（節錄）
@@ -798,42 +796,37 @@ def syntax_ok(sql: str, schema_ddl: str) -&gt; tuple[bool, str]:
 <aside class="callout callout-tip"><strong>提示</strong><p><strong>教學點</strong>：語法正確、<code>EXPLAIN</code> 也過，但<strong>結果錯了</strong>。這說明 self-test 擋得住語法錯、擋不住語意錯。要降低這類錯誤，harness 能做 schema grounding、few-shot 等，但最終「對不對」仍由評分環境在 hidden DB 上裁定。</p></aside>
 
 <h3 id="2-3-pairwise-track-code-author-skill-bug-hunter-skill">2.3 Pairwise Track — Code Author Skill + Bug Hunter Skill</h3>
-<p>本 Track 由<strong>兩個角色</strong>構成，每位學生在以下二者中<strong>擇一實作</strong>：</p>
-<ul>
-<li><strong>Code Author</strong></li>
-<li><strong>Bug Hunter</strong></li>
-</ul>
-<p>未選擇的角色不需提交，也不會因未提交而扣分。評分時，課程的 Hermes Agent 會把你的 skill 與另一位同學或 staff reference 的對向 skill 自動配對。你無法選擇配對對象。</p>
+<p>本 Track 由<strong>兩個角色</strong>構成：<strong>Code Author</strong> 與 <strong>Bug Hunter</strong>。</p>
+<p><strong>每位學生（含兩人組）兩個角色都要實作並提交。</strong> 評分時，課程會<strong>隨機抽取你的其中一個角色</strong>，並與另一位同學隨機配對的對向角色進行評分。你無法選擇被抽到哪個角色，也無法選擇配對對象。</p>
 <h4>Pairwise role 宣告</h4>
-<p>每位學生必須在 repo 根目錄提供 <code>PAIRWISE_ROLE.md</code>，內容如下：</p>
-<pre><code class="language-markdown">role: code-author
-skill_path: skills/code-author-&lt;github_id&gt;/
-</code></pre>
-<p>或：</p>
-<pre><code class="language-markdown">role: bug-hunter
-skill_path: skills/bug-hunter-&lt;github_id&gt;/
+<p>每位學生必須在 repo 根目錄提供 <code>PAIRWISE_ROLE.md</code>，<strong>同時宣告兩個角色的 skill 路徑</strong>，格式如下：</p>
+<pre><code class="language-markdown">roles:
+  - role: code-author
+    skill_path: skills/code-author-&lt;github_id&gt;/
+  - role: bug-hunter
+    skill_path: skills/bug-hunter-&lt;github_id&gt;/
 </code></pre>
 <p>規則：</p>
 <ol>
-<li><code>role</code> 只能是 <code>code-author</code> 或 <code>bug-hunter</code>。</li>
-<li><code>skill_path</code> 必須指向實際存在的 skill 資料夾。</li>
-<li>評分器只依 <code>PAIRWISE_ROLE.md</code> 宣告的角色評分。</li>
-<li>若同時提交兩個 Pairwise skill，未宣告的另一個 skill 會被忽略。</li>
-<li>若 <code>PAIRWISE_ROLE.md</code> 缺漏、格式錯誤或 <code>skill_path</code> 不存在，Pairwise Track 視為無法評分，該 Track 0 分。</li>
+<li><code>roles</code> 必須<strong>同時包含</strong> <code>code-author</code> 與 <code>bug-hunter</code> 兩筆，且不可重複。</li>
+<li>每個 <code>skill_path</code> 必須指向實際存在、且能被 <code>hermes skills list</code> 看到的 skill 資料夾。</li>
+<li>評分時課程會<strong>隨機抽取其中一個角色</strong>評分，並與另一位同學隨機配對；抽取與配對皆以固定 random seed 進行並保存 log。</li>
+<li>兩個角色都會被納入隨機抽取池；你無法指定要被評哪一個。</li>
+<li>若 <code>PAIRWISE_ROLE.md</code> 缺漏、格式錯誤、未同時宣告兩個角色，或任一 <code>skill_path</code> 不存在 / 無法被載入，Pairwise Track 視為無法評分，該 Track 0 分。</li>
 </ol>
 <h4>Pairwise 配對公平性</h4>
 <p>為避免分數受隨機對手品質過度影響，Pairwise 計分採以下原則：</p>
 <ol>
 <li><strong>Code Author 分數只由其 code 在 hidden tests 上的表現決定</strong>，不受配對 Bug Hunter 品質影響。</li>
 <li><strong>Bug Hunter 分數由三部分組成</strong>：
-   - 50%：staff reference buggy code
-   - 25%：staff reference clean code
-   - 25%：學生 Code Author code</li>
+ - 50%：staff reference buggy code
+ - 25%：staff reference clean code
+ - 25%：學生 Code Author code</li>
 <li>對學生 Code Author code 的部分，評分器會以固定 random seed，為每個 Bug Hunter 抽取 <code>K</code> 個不同 Code Author 輸出進行評估；<code>K</code> 以 starter repo 或課程公告為準。</li>
 <li>若可用 Code Author 數量不足，則以 staff reference author 補足。</li>
-<li>random seed、配對清單與每次執行 log 會在評分後保存，供查核。</li>
+<li>random seed、角色抽取結果、配對清單與每次執行 log 會在評分後保存，供查核。</li>
 </ol>
-<aside class="callout callout-tip"><strong>提示</strong><p><strong>為什麼是兩個 skill 而非 subagent？</strong> 對應課程「Skill vs. Sub-Agent」的預設原則：Pairwise 的兩個角色各自是 stateless、固定 schema 的工作，用兩個 skill 最貼切；subagent（自主多步迴圈）留給 Open Track 真正需要時再用。</p></aside>
+<aside class="callout callout-tip"><strong>提示</strong><p><strong>為什麼兩個角色都要做、卻只隨機抽一個評？</strong> 因為我們希望你完整理解 Pairwise 的「雙邊」—— 寫得出好 code、也抓得出別人的 bug，這兩種能力都要練。隨機抽評則讓你無法只賭一邊，必須兩邊都做穩。這也呼應課程「Skill vs. Sub-Agent」的預設原則：兩個角色各自是 stateless、固定 schema 的工作，用兩個 skill 最貼切；subagent（自主多步迴圈）留給 Open Track 真正需要時再用。</p></aside>
 
 <h4>Skill A — Code Author</h4>
 <ul>
@@ -974,7 +967,7 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 <h4>完整範例：一個 scenario 從頭到尾</h4>
 <p>示範 <code>task_042</code>（實作 <code>merge_intervals</code>）。</p>
 <p><strong>① 評分環境呼叫 Code Author skill</strong>：</p>
-<pre><code class="language-bash">hermes chat --toolsets skills -q '/code-author-&lt;github_id&gt; {&quot;task_id&quot;:&quot;task_042&quot;,&quot;task_description&quot;:&quot;Implement merge_intervals(intervals): merge overlapping intervals, empty input returns [].&quot;,&quot;constraints&quot;:{&quot;entry_function&quot;:&quot;merge_intervals&quot;,&quot;max_loc&quot;:500,&quot;imports_forbidden&quot;:[&quot;os&quot;,&quot;sys&quot;]}}'
+<pre><code class="language-bash">hermes chat --toolsets skills,terminal --yolo -q '/code-author-&lt;github_id&gt; {&quot;task_id&quot;:&quot;task_042&quot;,&quot;task_description&quot;:&quot;Implement merge_intervals(intervals): merge overlapping intervals, empty input returns [].&quot;,&quot;constraints&quot;:{&quot;entry_function&quot;:&quot;merge_intervals&quot;,&quot;max_loc&quot;:500,&quot;imports_forbidden&quot;:[&quot;os&quot;,&quot;sys&quot;]}}'
 </code></pre>
 <p><strong>② Skill A 輸出</strong>（此例 Author 漏了空輸入 edge case）：</p>
 <pre><code class="language-json">{
@@ -990,7 +983,7 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 <p>這段 code 在一般輸入正確，但<strong>空輸入 <code>[]</code> 會在 <code>intervals[0]</code> 崩潰</strong>。Author 的自測沒涵蓋空輸入，所以沒發現。</p>
 </blockquote>
 <p><strong>③ 評分環境把 A 的輸出餵給 Bug Hunter skill</strong>：</p>
-<pre><code class="language-bash">hermes chat --toolsets skills -q '/bug-hunter-&lt;github_id&gt; {&quot;task_id&quot;:&quot;task_042&quot;,&quot;code&quot;:&quot;...&quot;,&quot;task_description&quot;:&quot;...empty input returns [].&quot;}'
+<pre><code class="language-bash">hermes chat --toolsets skills,terminal --yolo -q '/bug-hunter-&lt;github_id&gt; {&quot;task_id&quot;:&quot;task_042&quot;,&quot;code&quot;:&quot;...&quot;,&quot;task_description&quot;:&quot;...empty input returns [].&quot;}'
 </code></pre>
 <p><strong>④ Skill B 輸出</strong>（成功抓到 edge case）：</p>
 <pre><code class="language-json">{
@@ -1091,14 +1084,7 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 <li>自定 metric 是否真的可驗證且不可 gameable；</li>
 <li>輸出 schema 是否足以被自動解析與評分。</li>
 </ol>
-<p>合規判定會產生 machine-readable report，至少包含：</p>
-<ul>
-<li>是否通過七區塊格式檢查；</li>
-<li>找到的 skill path；</li>
-<li>推導出的 <code>hermes chat</code> 呼叫方式；</li>
-<li>判定 metric 是否可驗證；</li>
-<li>若不通過，列出不通過原因與對應區塊。</li>
-</ul>
+<p>合規判定會產生 machine-readable report，至少包含：是否通過七區塊格式檢查、找到的 skill path、推導出的 <code>hermes chat</code> 呼叫方式、判定 metric 是否可驗證、若不通過則列出不通過原因與對應區塊。</p>
 <p>合規判定由 LLM judge 輔助，但最終以評分器產生的 report 為準。課程保留人工覆核明顯工具錯誤的權利；但學生不得以 deadline 後未寫在 repo 內的資訊補充說明。</p>
 <h4>跨 skill 協作（鼓勵）</h4>
 <p>我們<strong>特別歡迎</strong>彼此認識的同學，讓各自的 skill 在同一個 Hermes Agent 上互相呼叫、共同呈現成果 —— 這正是 multi-agent 系統最有趣的地方。若你想這麼做：</p>
@@ -1117,10 +1103,10 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 │   ├── text2sql-&lt;github_id&gt;/             # Basic Track，必交
 │   │   ├── SKILL.md                      # 必要
 │   │   └── scripts/                      # 你的 harness（run.py 等）
-│   ├── code-author-&lt;github_id&gt;/          # Pairwise，若選 Code Author
+│   ├── code-author-&lt;github_id&gt;/          # Pairwise，必交
 │   │   ├── SKILL.md
 │   │   └── scripts/
-│   ├── bug-hunter-&lt;github_id&gt;/           # Pairwise，若選 Bug Hunter
+│   ├── bug-hunter-&lt;github_id&gt;/           # Pairwise，必交
 │   │   ├── SKILL.md
 │   │   └── scripts/
 │   └── open-&lt;short-name&gt;-&lt;github_id&gt;/    # Open Track，必交
@@ -1128,7 +1114,7 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 │       └── scripts/
 ├── dev_set/                              # 課程提供之公開 dev set（含答案）供本地自測
 ├── run_dev.py                            # 本地自測：驅動 hermes chat -q 跑 dev set 並比對
-├── PAIRWISE_ROLE.md                      # Pairwise 角色宣告，必交
+├── PAIRWISE_ROLE.md                      # Pairwise 角色宣告（兩角色皆宣告），必交
 ├── OPEN_TRACK.md                         # Open Track 宣告，必交
 └── report.md                             # 期末報告，必交
 </code></pre>
@@ -1147,11 +1133,11 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 <li><strong>安裝 skill</strong>：把每位學生 <code>skills/</code> 下的 skill 安裝進課程 Hermes 的 <code>~/.hermes/skills/</code>（等同 <code>hermes skills install</code>）。</li>
 <li><strong>安裝 Python dependencies</strong>：若 skill 目錄下有 <code>scripts/requirements.txt</code>，依 §1.6 規則安裝。</li>
 <li><strong>Security scan</strong>：安裝時會經過 Hermes 內建的 security 掃描；含危險操作（破壞性指令、資料外洩、prompt injection 等）者會被擋下並記錄。</li>
-<li><strong>執行 hidden scenarios</strong>：以 <code>hermes chat --toolsets skills -q</code> 對每個 skill 餵入 hidden 任務；Pairwise 題目則串接對向 skill 或 staff reference skill。</li>
+<li><strong>執行 hidden scenarios</strong>：以正式評分指令（見 §5.4）對每個 skill 餵入 hidden 任務；Pairwise 題目則隨機抽取角色並串接對向 skill 或 staff reference skill。</li>
 <li><strong>擷取 JSON</strong>：擷取每次執行的最後一個 fenced JSON 區塊，並做 schema validation。</li>
 <li><strong>計分</strong>：對 hidden set / Open Track metric 自動比對，計算分數，產出 scoreboard 與 grading report。</li>
 </ol>
-<aside class="callout callout-warn"><strong>注意</strong><p><strong>程式正確性是你的責任。</strong> 本專案<strong>不提供 CI 自動檢查</strong>。繳交前，請務必在你自己本地安裝的 Hermes Agent 上，實際以 <code>/skill-name</code> 或 <code>hermes chat -q</code> 確認你的 skill 能被載入、能正常產生符合輸出契約的結果。若 6/17 評分時你的 skill 裝不起來、無法被呼叫、或輸出不符契約，該部分將無法得分 —— 沒有事後補救機會。</p></aside>
+<aside class="callout callout-warn"><strong>注意</strong><p><strong>程式正確性是你的責任。</strong> 本專案<strong>不提供 CI 自動檢查</strong>。繳交前，請務必在你自己本地安裝的 Hermes Agent 上，實際以正式評分指令（見 §5.4）確認你的 skill 能被載入、能正常產生符合輸出契約的結果。若 6/17 評分時你的 skill 裝不起來、無法被呼叫、或輸出不符契約，該部分將無法得分 —— 沒有事後補救機會。</p></aside>
 
 <h3 id="3-4-demo-day-定義">3.4 Demo Day 定義</h3>
 <p>本專案之 Demo Day 指課程於 2026/6/17 使用統一 Hermes Agent 評分環境執行全班 skill，並展示部分代表性成果。除非課程另行公告，學生不需於 Demo Day 現場重新操作、口頭報告或補交檔案。Demo Day 當天無法以口頭說明修正 repo 中缺漏的資訊。</p>
@@ -1162,29 +1148,29 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 <thead>
 <tr>
 <th>項目</th>
-<th style="text-align: right;">配分</th>
+<th>配分</th>
 <th>評分方式</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Basic Track（必做）</td>
-<td style="text-align: right;">30</td>
+<td>30</td>
 <td>Hidden test 自動評分</td>
 </tr>
 <tr>
 <td>Pairwise Track（必做）</td>
-<td style="text-align: right;">20</td>
-<td>自動評分；依 <code>PAIRWISE_ROLE.md</code> 宣告角色計分</td>
+<td>20</td>
+<td>自動評分；兩角色皆須實作，評分時隨機抽取一個角色</td>
 </tr>
 <tr>
 <td>Open Track（必做）</td>
-<td style="text-align: right;">40</td>
+<td>40</td>
 <td>合規 gate（pass/fail）+ scenario 70% + 互動 log 30%</td>
 </tr>
 <tr>
 <td>報告 + Demo Day</td>
-<td style="text-align: right;">10</td>
+<td>10</td>
 <td>設計決策與失敗分析深度</td>
 </tr>
 </tbody>
@@ -1202,7 +1188,7 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 <aside class="callout callout-tip"><strong>提示</strong><p><strong>此 metric 不可 gameable</strong>：hidden DB 內容不可見（無法猜答案）、SQL 須語法正確且可執行（無法抄關鍵字）、結果採 bag equality（無法靠排序或重複列碰運氣）。metric 與產出物之因果鏈越短，gameable 空間越小。</p></aside>
 
 <h3 id="4-2-pairwise-track-評分-20-分">4.2 Pairwise Track 評分（20 分）</h3>
-<p>Pairwise Track 依 <code>PAIRWISE_ROLE.md</code> 宣告的角色評分。</p>
+<p>Pairwise Track 兩個角色都要實作；評分時課程<strong>隨機抽取你的其中一個角色</strong>計分，並與另一位同學隨機配對。被抽到的角色依下列規則計分。</p>
 <h4>Skill A — Code Author</h4>
 <ul>
 <li>將輸出的 code 置入 sandbox 執行 hidden test cases（每題約 10 個）。</li>
@@ -1216,7 +1202,7 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 <thead>
 <tr>
 <th>對象</th>
-<th style="text-align: right;">權重</th>
+<th>權重</th>
 <th>衡量指標</th>
 <th>用意</th>
 </tr>
@@ -1224,19 +1210,19 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 <tbody>
 <tr>
 <td>Staff reference buggy code</td>
-<td style="text-align: right;">50%</td>
+<td>50%</td>
 <td>Bug detection F1（行號精確比對）</td>
 <td>測 recall</td>
 </tr>
 <tr>
 <td>Staff reference clean code</td>
-<td style="text-align: right;">25%</td>
+<td>25%</td>
 <td>False positive rate</td>
 <td>測誤報</td>
 </tr>
 <tr>
 <td>學生 Code Author code</td>
-<td style="text-align: right;">25%</td>
+<td>25%</td>
 <td>B 報的 bug 是否對應 A 之實際 hidden-test failure（以最小觸發 input 與行號比對）</td>
 <td>測實戰準確度</td>
 </tr>
@@ -1244,29 +1230,31 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 </table>
 <p>加分項：<code>bug.type</code> 分類正確 + <code>suggested_fix</code> 經 judge 認定可行。</p>
 <p>設計限制：永遠報一堆 bug → false positive rate 懲罰；永遠報乾淨 → recall 歸零。須具備真實 code review 能力方能得高分。</p>
+<aside class="callout callout-tip"><strong>提示</strong><p><strong>兩個角色都要做穩。</strong> 因為評分時是隨機抽一個角色計分，你無法預知會被抽到 Code Author 還是 Bug Hunter，所以兩邊都要做到可用、可驗證；只練一邊是高風險的賭注。</p></aside>
+
 <h3 id="4-3-open-track-評分-40-分">4.3 Open Track 評分（40 分）</h3>
 <table>
 <thead>
 <tr>
 <th>項目</th>
-<th style="text-align: right;">權重</th>
+<th>權重</th>
 <th>評分方式</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>合規判定（gate）</td>
-<td style="text-align: right;">pass/fail</td>
+<td>pass/fail</td>
 <td>七區塊齊全、skill 可裝進 Hermes 並被呼叫、呼叫方式可推導執行、metric 可驗證且不可 gameable。不過門檻直接 0 分。</td>
 </tr>
 <tr>
 <td>自定 scenario 表現</td>
-<td style="text-align: right;">70%</td>
+<td>70%</td>
 <td>按 <code>OPEN_TRACK.md</code> 宣告之 metric 與 staff perturbation 自動評分。</td>
 </tr>
 <tr>
 <td>互動 log 品質</td>
-<td style="text-align: right;">30%</td>
+<td>30%</td>
 <td>是否確實在 Hermes 上完成 skill 工作；若宣告跨 skill 協作，需有雙向互動或明確資料流證據。</td>
 </tr>
 </tbody>
@@ -1286,26 +1274,25 @@ skill_path: skills/bug-hunter-&lt;github_id&gt;/
 <thead>
 <tr>
 <th>項目</th>
-<th style="text-align: right;">分數</th>
+<th>分數</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>設計決策清楚且與 verifiability 對應</td>
-<td style="text-align: right;">3</td>
+<td>3</td>
 </tr>
 <tr>
 <td>失敗分析具體，且有 log 證據</td>
-<td style="text-align: right;">5</td>
+<td>5</td>
 </tr>
 <tr>
 <td>改進方向可執行</td>
-<td style="text-align: right;">2</td>
+<td>2</td>
 </tr>
 </tbody>
 </table>
-<aside class="callout callout-note"><strong>參考</strong><p><strong>參考框架：MAST taxonomy（選用，非必要）</strong><br />
-MAST（Multi-Agent System failure Taxonomy）是一套描述「multi-agent 系統為何失敗」的分類詞彙。它把常見失敗歸納為三大類：<strong>(1) 規格與角色問題</strong>（沒照任務規格做、偏離角色）、<strong>(2) agent 間協調問題</strong>（資訊沒傳到、訊息被誤解）、<strong>(3) 驗證與品質控制問題</strong>（驗證步驟做錯、品質把關失效）。報告中你可<strong>選用</strong>這套詞彙標記遇到的失敗使分析更有結構；但<strong>不強制</strong>對應特定編號，用自己的話清楚描述成因亦可。</p></aside>
+<aside class="callout callout-note"><strong>參考</strong><p><strong>參考框架：MAST taxonomy（選用，非必要）</strong> MAST（Multi-Agent System failure Taxonomy）是一套描述「multi-agent 系統為何失敗」的分類詞彙。它把常見失敗歸納為三大類：<strong>(1) 規格與角色問題</strong>（沒照任務規格做、偏離角色）、<strong>(2) agent 間協調問題</strong>（資訊沒傳到、訊息被誤解）、<strong>(3) 驗證與品質控制問題</strong>（驗證步驟做錯、品質把關失效）。報告中你可<strong>選用</strong>這套詞彙標記遇到的失敗使分析更有結構；但<strong>不強制</strong>對應特定編號，用自己的話清楚描述成因亦可。</p></aside>
 
 <p>本專案常見之失敗情境：</p>
 <table>
@@ -1363,19 +1350,31 @@ hermes doctor           # 檢查安裝是否正常
 <li><strong>方式 B</strong>：把 skill 資料夾複製到 <code>~/.hermes/skills/</code> 下。</li>
 </ul>
 <p>裝好後，<code>hermes skills list</code> 應能看到你的 skill；在 <code>hermes</code> 互動介面打 <code>/text2sql-&lt;github_id&gt;</code> 即可觸發。</p>
-<h3 id="5-4-本地自測">5.4 本地自測</h3>
-<p>三種層次：</p>
+<h3 id="5-4-正式評分指令與本地自測">5.4 正式評分指令與本地自測</h3>
+<h4>正式評分指令（請本地用同一條）</h4>
+<p>評分環境驅動每個 skill 的<strong>正式指令</strong>為：</p>
+<pre><code class="language-bash">hermes chat --toolsets skills,terminal --yolo -q '/skill-name {json}'
+</code></pre>
+<ul>
+<li><code>skills,terminal</code>：載入 skill + 允許執行 <code>scripts/</code>，缺一不可（你的 harness 要跑確定性 code，需要 <code>terminal</code>）。</li>
+<li><code>--yolo</code>：評分為全自動，需自動放行工具呼叫，不會停下來等人確認。</li>
+<li><code>-q</code>：非互動式，直接吃 prompt。</li>
+</ul>
+<p>請本地自測就用這條，與評分環境一致。<code>run_dev.py</code> 也會以此指令驅動。</p>
+<h4>三層本地自測</h4>
 <pre><code class="language-bash"># (1) 互動式單題測試
 hermes                         # 進入 CLI，輸入 /text2sql-&lt;github_id&gt; {...} 觀察輸出
 
 # (2) 非互動式單題（與評分環境同一條路徑）
-hermes chat --toolsets skills -q '/text2sql-&lt;github_id&gt; {&quot;task_id&quot;:&quot;...&quot;,&quot;question&quot;:&quot;...&quot;,&quot;db_schema&quot;:&quot;...&quot;,&quot;dialect&quot;:&quot;sqlite&quot;}'
+hermes chat --toolsets skills,terminal --yolo -q '/text2sql-&lt;github_id&gt; {&quot;task_id&quot;:&quot;...&quot;,&quot;question&quot;:&quot;...&quot;,&quot;db_schema&quot;:&quot;...&quot;,&quot;dialect&quot;:&quot;sqlite&quot;}'
 
 # (3) 批次自測：對整份 dev set 跑一遍並自動比對（starter repo 附）
-python run_dev.py              # 驅動 hermes chat -q 跑 dev_set/、擷取 JSON、與答案比對、印出 pass/fail
+python run_dev.py              # 驅動 hermes chat 跑 dev_set/、擷取 JSON、與答案比對、印出 pass/fail
 </code></pre>
 <aside class="callout callout-note"><strong>重點</strong><p><strong>dev set 含答案，hidden set 不含。</strong> <code>run_dev.py</code> 能在本地算出你在 dev set 上的 pass rate，是你唯一可靠的自我檢驗工具。評分用的 hidden set 永遠不會給你答案。</p></aside>
 
+<h4>單次呼叫 timeout</h4>
+<p>評分時，<strong>每一次 skill 呼叫（含 LLM 推理 + <code>scripts/</code> 執行 + retry）的 wall-clock 上限暫定為 120 秒</strong>，超時則該題不計分。此值為暫定值，若實測下來合理的 retry 流程普遍逼近上限，課程會與同學討論後調整。注意這與 Code Author sandbox 內「每個 hidden test case 5 秒」是兩件不同的事：120 秒是整個 skill 被呼叫一次的總上限。</p>
 <h3 id="5-5-reference-skills-pairwise-對手">5.5 Reference Skills（Pairwise 對手）</h3>
 <p>Pairwise 題之 skill 須對課程提供之多種策略對手測試（皆可從 starter repo 安裝）：</p>
 <p><strong>供 Code Author 測試之 Bug Hunter</strong>：</p>
@@ -1437,11 +1436,11 @@ python run_dev.py              # 驅動 hermes chat -q 跑 dev_set/、擷取 JSO
 <li>[ ] default branch 上已有最終版本。</li>
 <li>[ ] skill folder name 與 <code>SKILL.md</code> frontmatter <code>name</code> 一致。</li>
 <li>[ ] <code>hermes skills list</code> 看得到你的 skill。</li>
-<li>[ ] <code>hermes chat --toolsets skills -q '/skill-name {...}'</code> 可執行。</li>
+<li>[ ] <code>hermes chat --toolsets skills,terminal --yolo -q '/skill-name {...}'</code> 可執行。</li>
 <li>[ ] 最後輸出為單一合法 fenced JSON block。</li>
 <li>[ ] <code>task_id</code> 與輸入一致。</li>
 <li>[ ] Basic Track 可跑完 <code>python run_dev.py</code>。</li>
-<li>[ ] Pairwise 已在 <code>PAIRWISE_ROLE.md</code> 宣告角色。</li>
+<li>[ ] Pairwise 兩個角色皆已實作，且 <code>PAIRWISE_ROLE.md</code> 同時宣告兩個角色。</li>
 <li>[ ] Open Track 已填完 <code>OPEN_TRACK.md</code> 七個固定 heading。</li>
 <li>[ ] Open Track 至少提供 3 個 public scenarios，且 metric 可自動驗證。</li>
 <li>[ ] 所有非標準函式庫已寫入 <code>scripts/requirements.txt</code>。</li>
@@ -1449,26 +1448,12 @@ python run_dev.py              # 驅動 hermes chat -q 跑 dev_set/、擷取 JSO
 <li>[ ] <code>report.md</code> 含設計決策、執行 log 摘要、失敗分析、改進方向與引用說明。</li>
 </ul>
 <h3 id="5-8-評分器-gate-清單">5.8 評分器 gate 清單</h3>
-<p>評分器會依序檢查：</p>
-<ul>
-<li>repo clone success</li>
-<li>default branch resolved</li>
-<li>required files exist</li>
-<li>skill install success</li>
-<li>dependency install success</li>
-<li>skill callable</li>
-<li>stdout contains valid final fenced JSON</li>
-<li>JSON schema valid</li>
-<li>security scan pass</li>
-<li>runtime within timeout</li>
-<li>hidden / Open Track evaluator completed</li>
-</ul>
-<p>任一 gate 失敗，對應 Track 可能無法得分。</p>
+<p>評分器會依序檢查：repo clone success、default branch resolved、required files exist、skill install success、dependency install success、skill callable、stdout contains valid final fenced JSON、JSON schema valid、security scan pass、runtime within timeout、hidden / Open Track evaluator completed。任一 gate 失敗，對應 Track 可能無法得分。</p>
 <hr>
 <h2 id="六-學術誠信">六、學術誠信</h2>
 <ul>
 <li>本專案為<strong>個人作業</strong>。可討論架構、skill 設計、debug 思路；<strong>不得共寫 SKILL.md / scripts 或共用可直接提交的 prompt template</strong>。</li>
-<li>Pairwise 題之配對由課程自動指派，<strong>不得</strong>與同學私下約定配對以影響評分。</li>
+<li>Pairwise 題之配對由課程自動隨機指派，<strong>不得</strong>與同學私下約定配對以影響評分。</li>
 <li>若偵測到兩份 skill 高度相似，依學術誠信規定處理。</li>
 <li>嘗試在 skill 中以網路請求或 file system 存取 hidden set 內容者，Hermes 的 security 掃描與 sandbox 會擋下並記錄，以 0 分處理。</li>
 <li>成績公布後，學生可自行 fork 至個人帳號並設為 public 以作為作品集，或發佈為自己的 skill tap。</li>
@@ -1491,12 +1476,7 @@ python run_dev.py              # 驅動 hermes chat -q 跑 dev_set/、擷取 JSO
 <aside class="callout callout-tip"><strong>提示</strong><p><strong>誠信的引用不會扣分，隱藏的引用才會。</strong> 工程師站在巨人肩膀上是常態 —— 重點不是「你有沒有參考別人」，而是「你有沒有誠實說明、並展現你在其上的理解與改造」。清楚的引用與差異說明，本身就是工程能力的一部分。</p></aside>
 
 <h3 id="6-3-成果公開範圍">6.3 成果公開範圍</h3>
-<p>課程可能公開：</p>
-<ul>
-<li>本次專案整體成果摘要與統計；</li>
-<li>經課程挑選之優秀作品名稱、簡介、demo log 或截圖；</li>
-<li>經學生同意後公開之 repo / skill tap 連結。</li>
-</ul>
+<p>課程可能公開：本次專案整體成果摘要與統計；經課程挑選之優秀作品名稱、簡介、demo log 或截圖；經學生同意後公開之 repo / skill tap 連結。</p>
 <p>課程不會在未另行告知或未取得必要授權前，公開所有 private repo 原始碼。若需公開個人姓名、學號或 GitHub ID，將依課程與學校相關規範處理。</p>
 <hr>
 <h2 id="七-時程">七、時程</h2>
